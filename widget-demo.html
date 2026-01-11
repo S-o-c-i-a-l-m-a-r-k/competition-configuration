@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competition Config Widget - Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .demo-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .demo-content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .demo-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .demo-info h2 {
+            margin-top: 0;
+        }
+        .demo-info code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .demo-info pre {
+            background: #2d2d2d;
+            color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .demo-info pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🏆 Competition Configuration Tool - Widget Demo</h1>
+        <p>Embeddable widget for multi-round competition design</p>
+    </div>
+
+    <div class="demo-content">
+        <div class="demo-info">
+            <h2>How to Use This Widget</h2>
+            <p>The Competition Configuration Tool can be embedded in any webpage with just a few lines of code:</p>
+
+            <h3>Step 1: Add a target element</h3>
+            <pre><code>&lt;div id="competition-config"&gt;&lt;/div&gt;</code></pre>
+
+            <h3>Step 2: Include the widget script</h3>
+            <pre><code>&lt;script src="widget.js"&gt;&lt;/script&gt;</code></pre>
+
+            <h3>Step 3: Initialize the widget</h3>
+            <pre><code>&lt;script&gt;
+  CompetitionConfig.init('competition-config');
+&lt;/script&gt;</code></pre>
+
+            <h3>Using via jsDelivr CDN (once published to GitHub)</h3>
+            <pre><code>&lt;script src="https://cdn.jsdelivr.net/gh/username/repo@main/widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CompetitionConfig.init('competition-config');
+&lt;/script&gt;</code></pre>
+
+            <h3>Features</h3>
+            <ul>
+                <li>✅ Self-contained - all HTML, CSS, and JS bundled</li>
+                <li>✅ Automatic session storage (preserves settings on page reload)</li>
+                <li>✅ Real-time validation and calculations</li>
+                <li>✅ Dark theme UI</li>
+                <li>✅ Support for 2-10 rounds</li>
+                <li>✅ Automatic round naming (Final, Semifinal, Quarterfinal)</li>
+                <li>✅ Date calculations with full formatting</li>
+                <li>✅ Constraint validation</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Widget Container -->
+    <div id="competition-config"></div>
+
+    <!-- Widget Script -->
+    <script src="widget.js"></script>
+    <script>
+        // Initialize the widget
+        CompetitionConfig.init('competition-config');
+    </script>
+</body>
+</html>

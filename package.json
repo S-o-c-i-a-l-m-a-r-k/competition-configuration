@@ -1,0 +1,22 @@
+{
+  "name": "competition-configuration",
+  "version": "1.0.0",
+  "description": "JavaScript library for configuring multi-round competition structures with automatic cascade calculations",
+  "main": "src/index.js",
+  "scripts": {
+    "demo": "node demo.js"
+  },
+  "keywords": [
+    "competition",
+    "tournament",
+    "rounds",
+    "configuration",
+    "calculator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
