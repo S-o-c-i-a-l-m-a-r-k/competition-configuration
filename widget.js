@@ -195,6 +195,19 @@
                 transform: translateY(0);
             }
 
+            .cc-btn-small {
+                width: 100%;
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+
+            .cc-presets {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                margin-bottom: 10px;
+            }
+
             .cc-alert {
                 padding: 12px;
                 border-radius: 8px;
@@ -352,7 +365,9 @@
             .cc-flow-diagram {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 4px 0;
                 margin: 15px 0;
                 padding: 12px;
                 background: #1a1a1a;
@@ -362,25 +377,30 @@
 
             .cc-flow-item {
                 text-align: center;
-                flex: 1;
+                min-width: 60px;
+                padding: 4px 8px;
             }
 
             .cc-flow-value {
-                font-size: 1.2rem;
+                font-size: 1rem;
                 font-weight: 700;
                 color:rgb(255, 255, 255);
             }
 
             .cc-flow-label {
-                font-size: 0.75rem;
+                font-size: 0.65rem;
                 color: #a0a0a0;
-                margin-top: 4px;
+                margin-top: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 80px;
             }
 
             .cc-flow-arrow {
-                font-size: 1.5rem;
+                font-size: 1.2rem;
                 color: #505050;
-                margin: 0 8px;
+                margin: 0 2px;
             }
 
             .cc-calculating-indicator {
@@ -477,6 +497,13 @@
                                 <div id="cc-roundsContainer"></div>
                             </div>
 
+                            <div class="cc-presets">
+                                <small style="color: #aaa; margin-bottom: 2px;">Presets</small>
+                                <button class="cc-btn cc-btn-small" id="cc-preset1">4 Rounds (16 days)</button>
+                                <button class="cc-btn cc-btn-small" id="cc-preset2">5 Rounds (20 days)</button>
+                                <button class="cc-btn cc-btn-small" id="cc-preset3">8 Rounds (16 days)</button>
+                                <button class="cc-btn cc-btn-small" id="cc-preset4">10 Rounds (20 days)</button>
+                            </div>
                             <button class="cc-btn" id="cc-calculate-btn">🔄 Recalculate Now</button>
                         </div>
 
@@ -512,8 +539,6 @@
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div id="cc-constraintsCheck"></div>
                         </div>
                     </div>
                 </div>
@@ -627,11 +652,13 @@
                         this.rounds[i].startDate = prevEnd.toISOString().split('T')[0];
                     }
 
-                    // Final round must always have exactly 1 group
+                    // Final round: respect manual groups override, default to 1
                     if (isFinalRound) {
-                        this.rounds[i].numberOfGroups = 1;
-                        // Recalculate peoplePerGroup based on actual totalCompetitors
-                        this.rounds[i].peoplePerGroup = this.rounds[i].totalCompetitors;
+                        if (!this.rounds[i].numberOfGroups) {
+                            this.rounds[i].numberOfGroups = 1;
+                        }
+                        // Recalculate peoplePerGroup based on actual totalCompetitors and groups
+                        this.rounds[i].peoplePerGroup = this.rounds[i].totalCompetitors / this.rounds[i].numberOfGroups;
                     } else {
                         this.rounds[i].calculateMissingValue();
                     }
@@ -648,12 +675,20 @@
                     const validation = round.validate(index);
                     errors.push(...validation.errors);
                     warnings.push(...validation.warnings);
+
+                    // Check cascade consistency: groups × PPG should equal total competitors
+                    const expectedTotal = round.numberOfGroups * round.peoplePerGroup;
+                    const actualTotal = round.totalCompetitors;
+                    const cascadeDiff = Math.abs(expectedTotal - actualTotal);
+                    if (cascadeDiff > 1) {
+                        warnings.push(`Round ${index + 1}: ${round.numberOfGroups} groups × ${round.peoplePerGroup.toFixed(1)} PPG = ${expectedTotal.toLocaleString()}, but ${actualTotal.toLocaleString()} competitors entered`);
+                    }
                 });
 
                 if (this.rounds.length > 0) {
                     const finalRound = this.rounds[this.rounds.length - 1];
                     if (finalRound.numberOfGroups !== 1) {
-                        errors.push(`Final round must have exactly 1 group, but has ${finalRound.numberOfGroups}`);
+                        warnings.push(`Final round typically has 1 group, but is set to ${finalRound.numberOfGroups}`);
                     }
                 }
 
@@ -706,10 +741,12 @@
             for (let i = 0; i < numRounds; i++) {
                 const gateField = container.querySelector(`#cc-round${i}Gate`);
                 const peopleField = container.querySelector(`#cc-round${i}People`);
+                const groupsField = container.querySelector(`#cc-round${i}Groups`);
 
                 settings.rounds.push({
                     gate: gateField ? gateField.value : '',
-                    people: i > 0 && peopleField ? peopleField.value : ''
+                    people: i > 0 && peopleField ? peopleField.value : '',
+                    groups: groupsField ? groupsField.value : ''
                 });
             }
 
@@ -738,9 +775,13 @@
                     settings.rounds.forEach((round, i) => {
                         const gateField = container.querySelector(`#cc-round${i}Gate`);
                         const peopleField = container.querySelector(`#cc-round${i}People`);
+                        const groupsField = container.querySelector(`#cc-round${i}Groups`);
 
                         if (gateField && round.gate) {
                             gateField.value = round.gate;
+                        }
+                        if (groupsField && round.groups) {
+                            groupsField.value = round.groups;
                         }
                         if (i > 0 && peopleField && round.people) {
                             // For final round, use Target Finalists value instead of saved value
@@ -794,6 +835,11 @@
                     ${i === 0 ? `
                         <div class="cc-round-input">
                             <div class="cc-input-group">
+                                <label>Groups</label>
+                                <input type="number" id="cc-round${i}Groups" placeholder="auto" min="1" />
+                                <small>Leave blank for auto-calc</small>
+                            </div>
+                            <div class="cc-input-group">
                                 <label>People/Group</label>
                                 <input type="number" id="cc-round${i}People" value="25.20" step="0.01" readonly style="background: #3a3a3a; cursor: not-allowed;" />
                                 <small>Calculated automatically</small>
@@ -803,16 +849,37 @@
                                 <input type="number" id="cc-round${i}Gate" value="4" min="1" />
                             </div>
                         </div>
-                    ` : `
+                    ` : isFinalRound ? `
                         <div class="cc-round-input">
                             <div class="cc-input-group">
+                                <label>Groups</label>
+                                <input type="number" id="cc-round${i}Groups" value="1" min="1" />
+                                <small>Usually 1 for final</small>
+                            </div>
+                            <div class="cc-input-group">
                                 <label>People/Group</label>
-                                <input type="number" id="cc-round${i}People" value="${isFinalRound ? targetFinalists : '20'}" min="1" ${isFinalRound ? 'readonly style="background: #3a3a3a; cursor: not-allowed;"' : ''} />
-                                ${isFinalRound ? '<small>Synced with Target Finalists</small>' : ''}
+                                <input type="number" id="cc-round${i}People" value="${targetFinalists}" min="1" readonly style="background: #3a3a3a; cursor: not-allowed;" />
+                                <small>Synced with Target Finalists</small>
                             </div>
                             <div class="cc-input-group">
                                 <label>Gate Size</label>
-                                <input type="number" id="cc-round${i}Gate" value="${isFinalRound ? targetFinalists : '2'}" min="1" />
+                                <input type="number" id="cc-round${i}Gate" value="20" min="1" />
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="cc-round-input">
+                            <div class="cc-input-group">
+                                <label>Groups</label>
+                                <input type="number" id="cc-round${i}Groups" placeholder="auto" min="1" />
+                                <small>Leave blank for auto-calc</small>
+                            </div>
+                            <div class="cc-input-group">
+                                <label>People/Group</label>
+                                <input type="number" id="cc-round${i}People" value="20" min="1" />
+                            </div>
+                            <div class="cc-input-group">
+                                <label>Gate Size</label>
+                                <input type="number" id="cc-round${i}Gate" value="2" min="1" />
                             </div>
                         </div>
                     `}
@@ -833,24 +900,31 @@
                 const name = getAutomaticRoundName(i, numRounds);
                 const gateSize = parseInt(container.querySelector(`#cc-round${i}Gate`).value);
 
+                // Check for manual groups override
+                const groupsField = container.querySelector(`#cc-round${i}Groups`);
+                const manualGroups = groupsField && groupsField.value.trim() !== ''
+                    ? parseInt(groupsField.value)
+                    : null;
+
                 if (i === 0) {
                     rounds.push({
                         name,
                         gateSize,
                         duration: roundDuration,
-                        numberOfGroups: null
+                        numberOfGroups: manualGroups  // Use manual if set, null for auto-calc
                     });
                 } else {
                     const isFinalRound = i === numRounds - 1;
                     // For final round, use Target Finalists directly instead of reading from the field
-                    const peoplePerGroup = isFinalRound 
+                    const peoplePerGroup = isFinalRound
                         ? parseInt(container.querySelector('#cc-targetFinalists').value)
                         : parseInt(container.querySelector(`#cc-round${i}People`).value);
                     rounds.push({
                         name,
                         peoplePerGroup,
                         gateSize,
-                        duration: roundDuration
+                        duration: roundDuration,
+                        numberOfGroups: manualGroups  // Use manual if set, null for auto-calc
                     });
                 }
             }
@@ -859,59 +933,64 @@
                 const startingCompetitors = parseInt(container.querySelector('#cc-startingCompetitors').value);
                 const targetFinalists = parseInt(container.querySelector('#cc-targetFinalists').value);
 
-                // Calculate Round 1 numberOfGroups by working backwards from target finalists
-                // We need to determine how many people must advance from Round 1 to eventually reach the target
+                // Calculate groups needed for ALL rounds by working backwards from target finalists
+                // Store calculated values to use as placeholders and fallbacks
+                const calculatedGroups = new Array(rounds.length).fill(null);
+
+                // Final round: 1 group with all finalists
+                calculatedGroups[rounds.length - 1] = 1;
+
+                // Work backwards from the final round
                 let competitorsNeeded = targetFinalists;
 
-                // Work backwards from the final round to determine how many must advance from Round 1
-                // Key insight: to get X competitors into round i, we need enough groups in round i-1
-                // Round i-1 advances (numberOfGroups * gateSize) people
-                // So round i-1 needs ceil(X / round[i-1].gateSize) groups
                 for (let i = rounds.length - 1; i > 0; i--) {
-                    const currentRound = rounds[i];
                     // Use the PREVIOUS round's gateSize to calculate how many groups are needed there
                     const prevGateSize = rounds[i - 1].gateSize;
-
-                    // How many groups does round i-1 need to advance competitorsNeeded people?
                     const groupsNeededInPrev = Math.ceil(competitorsNeeded / prevGateSize);
 
                     if (i === 1) {
-                        // We've reached Round 1
-                        // Round 1 needs groupsNeededInPrev groups
-                        const round1GroupsNeeded = groupsNeededInPrev;
-
-                        // CRITICAL: We must respect the actual starting competitors
-                        // The numberOfGroups cannot result in more advancing than we have competitors
-                        // Calculate the maximum groups we can have with starting competitors
-                        // This ensures: numberOfGroups * gateSize <= startingCompetitors
+                        // Round 1: apply safety constraints
                         const maxPossibleGroups = Math.floor(startingCompetitors / rounds[0].gateSize);
-
-                        // Use the minimum of what's needed and what's possible
-                        // This ensures we never exceed starting competitors
-                        rounds[0].numberOfGroups = Math.min(round1GroupsNeeded, maxPossibleGroups);
-
-                        // Ensure we have at least 1 group
-                        rounds[0].numberOfGroups = Math.max(1, rounds[0].numberOfGroups);
-
-                        // Final safety check: ensure advancing won't exceed starting competitors
-                        const calculatedAdvancing = rounds[0].numberOfGroups * rounds[0].gateSize;
-                        if (calculatedAdvancing > startingCompetitors) {
-                            // If we'd advance more than we have, reduce numberOfGroups
-                            rounds[0].numberOfGroups = Math.floor(startingCompetitors / rounds[0].gateSize);
-                        }
-                        break;
+                        let round1Groups = Math.min(groupsNeededInPrev, maxPossibleGroups);
+                        round1Groups = Math.max(1, round1Groups);
+                        calculatedGroups[0] = round1Groups;
+                    } else {
+                        // Middle rounds
+                        calculatedGroups[i - 1] = groupsNeededInPrev;
                     }
 
                     // Calculate how many competitors round i-1 needs to have
-                    // groupsNeededInPrev groups at peoplePerGroup people each
-                    // IMPORTANT: Use the PREVIOUS round's PPG, not the current round's
                     const ppg = rounds[i - 1].peoplePerGroup || 20;
                     competitorsNeeded = groupsNeededInPrev * ppg;
                 }
 
-                // If we couldn't calculate (e.g., only 1 round), use a default calculation
+                // Check if R1 has a manual override
+                const r1HasManualOverride = rounds[0].numberOfGroups !== null;
+
+                // Apply calculated values where manual override is not set
+                // and update placeholder attributes to show auto-calculated values
+                for (let i = 0; i < rounds.length; i++) {
+                    const groupsField = container.querySelector(`#cc-round${i}Groups`);
+
+                    // Update placeholder to show what auto-calc produces
+                    if (groupsField && calculatedGroups[i] !== null) {
+                        groupsField.placeholder = calculatedGroups[i].toString();
+                    }
+
+                    // Apply calculated value if no manual override
+                    if (rounds[i].numberOfGroups === null) {
+                        // If R1 has manual override, only apply auto-calc to R1
+                        // Let middle rounds derive groups from PPG during cascade calculation
+                        if (i === 0 || !r1HasManualOverride) {
+                            rounds[i].numberOfGroups = calculatedGroups[i] || 1;
+                        }
+                        // For middle/final rounds when R1 is manual, leave null
+                        // so Competition.calculateAllRounds() derives from PPG
+                    }
+                }
+
+                // Fallback for Round 1 if still null
                 if (rounds[0].numberOfGroups === null || rounds[0].numberOfGroups === 0) {
-                    // Default: aim for around 25 people per group in Round 1
                     const defaultPeoplePerGroup = 25;
                     rounds[0].numberOfGroups = Math.max(1, Math.round(startingCompetitors / defaultPeoplePerGroup));
                 }
@@ -963,7 +1042,6 @@
             displaySummary(summary);
             displayFlowDiagram();
             displayTable();
-            displayConstraints(validation);
 
             const indicator = container.querySelector('#cc-calculatingIndicator');
             if (indicator) indicator.classList.remove('active');
@@ -1081,67 +1159,115 @@
             }).join('');
         }
 
-        function displayConstraints(validation) {
-            const constraintsContainer = container.querySelector('#cc-constraintsCheck');
-            const finalRound = currentCompetition.rounds[currentCompetition.rounds.length - 1];
+        function getNextFourth() {
+            const today = new Date();
+            let year = today.getFullYear();
+            let month = today.getMonth();
 
-            const checks = [
-                {
-                    label: 'All groups are whole numbers',
-                    passed: currentCompetition.rounds.every(r => Number.isInteger(r.numberOfGroups))
-                },
-                {
-                    label: 'All gate sizes are whole numbers',
-                    passed: currentCompetition.rounds.every(r => Number.isInteger(r.gateSize))
-                },
-                {
-                    label: 'All advancing counts are whole numbers',
-                    passed: currentCompetition.rounds.every(r => Number.isInteger(r.getAdvancingCompetitors()))
-                },
-                {
-                    label: 'Enough entries in each group to advance',
-                    passed: currentCompetition.rounds.every(r => r.gateSize <= r.peoplePerGroup)
-                },
-                {
-                    label: 'Final round has exactly one group',
-                    passed: finalRound.numberOfGroups === 1
-                }
-            ];
+            // Check if the 4th of this month is still upcoming
+            const fourthThisMonth = new Date(year, month, 4);
+            if (fourthThisMonth > today) {
+                return fourthThisMonth.toISOString().split('T')[0];
+            }
 
-            constraintsContainer.innerHTML = `
-                <div class="cc-section">
-                    <h3>Constraints Validation</h3>
-                    <table class="cc-table" style="border: none;">
-                        <tbody>
-                            ${checks.map(check => `
-                                <tr>
-                                    <td style="border: none;">
-                                        ${check.passed ? '✅' : '❌'} ${check.label}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            // Otherwise, get the 4th of next month
+            month++;
+            if (month > 11) {
+                month = 0;
+                year++;
+            }
+            const fourthNextMonth = new Date(year, month, 4);
+            return fourthNextMonth.toISOString().split('T')[0];
         }
 
-        function loadPreset() {
-            container.querySelector('#cc-startingCompetitors').value = '63000';
+        function loadPreset(presetNum) {
+            const startDate = getNextFourth();
+
+            // Common settings for all presets
+            container.querySelector('#cc-startingCompetitors').value = '52000';
             container.querySelector('#cc-targetFinalists').value = '100';
-            container.querySelector('#cc-numberOfRounds').value = '4';
-            container.querySelector('#cc-roundDuration').value = '4';
-            container.querySelector('#cc-startDate').value = '2025-11-04';
+            container.querySelector('#cc-startDate').value = startDate;
+
+            const presets = {
+                1: {
+                    // 4 rounds, 4 days each
+                    numRounds: 4,
+                    duration: 4,
+                    rounds: [
+                        { groups: '2500', gate: '4' },
+                        { people: '20', gate: '2' },
+                        { people: '20', gate: '2' },
+                        { gate: '20' }  // Final
+                    ]
+                },
+                2: {
+                    // 5 rounds, 4 days each
+                    numRounds: 5,
+                    duration: 4,
+                    rounds: [
+                        { groups: '6250', gate: '4' },
+                        { people: '20', gate: '4' },
+                        { people: '20', gate: '4' },
+                        { people: '20', gate: '2' },
+                        { gate: '20' }  // Final
+                    ]
+                },
+                3: {
+                    // 8 rounds, 2 days each
+                    numRounds: 8,
+                    duration: 2,
+                    rounds: [
+                        { groups: '2560', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '5' },
+                        { people: '20', gate: '5' },
+                        { gate: '20' }  // Final
+                    ]
+                },
+                4: {
+                    // 10 rounds, 2 days each
+                    numRounds: 10,
+                    duration: 2,
+                    rounds: [
+                        { groups: '2560', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { people: '20', gate: '10' },
+                        { gate: '20' }  // Final
+                    ]
+                }
+            };
+
+            const preset = presets[presetNum] || presets[1];
+
+            container.querySelector('#cc-numberOfRounds').value = preset.numRounds.toString();
+            container.querySelector('#cc-roundDuration').value = preset.duration.toString();
 
             updateRoundsUI();
 
             setTimeout(() => {
-                container.querySelector('#cc-round0Gate').value = '4';
-                container.querySelector('#cc-round1People').value = '20';
-                container.querySelector('#cc-round1Gate').value = '2';
-                container.querySelector('#cc-round2People').value = '20';
-                container.querySelector('#cc-round2Gate').value = '2';
-                container.querySelector('#cc-round3Gate').value = '20';
+                preset.rounds.forEach((round, i) => {
+                    if (round.groups) {
+                        const groupsField = container.querySelector(`#cc-round${i}Groups`);
+                        if (groupsField) groupsField.value = round.groups;
+                    }
+                    if (round.people) {
+                        const peopleField = container.querySelector(`#cc-round${i}People`);
+                        if (peopleField) peopleField.value = round.people;
+                    }
+                    if (round.gate) {
+                        const gateField = container.querySelector(`#cc-round${i}Gate`);
+                        if (gateField) gateField.value = round.gate;
+                    }
+                });
                 updateFinalRoundPeopleField();
                 setupRoundListeners();
                 saveSettings();
@@ -1183,6 +1309,10 @@
             for (let i = 0; i < numRounds; i++) {
                 const gateField = container.querySelector(`#cc-round${i}Gate`);
                 if (gateField) gateField.addEventListener('input', autoCalculate);
+
+                // Add listener for Groups field (all rounds)
+                const groupsField = container.querySelector(`#cc-round${i}Groups`);
+                if (groupsField) groupsField.addEventListener('input', autoCalculate);
 
                 if (i > 0) {
                     const peopleField = container.querySelector(`#cc-round${i}People`);
@@ -1226,13 +1356,17 @@
                     calculate();
                 }, 100);
             } else {
-                loadPreset();
+                loadPreset(1);
             }
         }
 
         // Event listeners
         container.querySelector('#cc-numberOfRounds').addEventListener('change', updateRoundsUIWithListeners);
         container.querySelector('#cc-calculate-btn').addEventListener('click', calculate);
+        container.querySelector('#cc-preset1').addEventListener('click', () => loadPreset(1));
+        container.querySelector('#cc-preset2').addEventListener('click', () => loadPreset(2));
+        container.querySelector('#cc-preset3').addEventListener('click', () => loadPreset(3));
+        container.querySelector('#cc-preset4').addEventListener('click', () => loadPreset(4));
 
         // Start
         init();
