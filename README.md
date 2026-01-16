@@ -3,7 +3,7 @@
 A powerful system for designing and validating multi-round competition structures with real-time calculations and constraint validation. Available as both an **embeddable widget** for web projects and a **Node.js API** for programmatic use.
 
 ![Dark Theme UI](https://img.shields.io/badge/theme-dark-black)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-1.1.0-green)
 
 ## Overview
 
@@ -22,16 +22,18 @@ Perfect for integrating into web applications:
 ```html
 <!-- Add to any webpage -->
 <div id="competition-config"></div>
-<script src="https://cdn.jsdelivr.net/gh/username/competition-configuration@1.0.0/widget.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.0/widget.js"></script>
 <script>CompetitionConfig.init('competition-config');</script>
 ```
 
 **Widget Features:**
 - 🎨 Complete dark theme UI
 - 📊 Real-time validation and calculations
+- 🎛️ Manual groups override for all rounds
+- 📋 Preset configurations (4/5/8/10 rounds)
 - 💾 Session storage (preserves settings)
 - 🚀 Single file, zero dependencies
-- ⚡ Lightweight (~35KB)
+- ⚡ Lightweight (~50KB)
 - 🔧 3 lines of code to embed
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for widget deployment details.
@@ -57,11 +59,36 @@ console.table(comp.toTable());
 ## Features
 
 - **Automatic Calculations**: Change Round 1 groups and see all rounds recalculate
+- **Manual Groups Override**: Set exact group counts for any round (new in v1.1.0)
+- **Preset Configurations**: Quick-start templates for 4, 5, 8, or 10 round competitions
 - **Integer Constraints**: Enforces whole numbers for groups and advancing competitors
 - **Fractional Support**: Handles fractional people per group (e.g., 25.2 people per group)
 - **Date Management**: Automatically calculates round dates based on duration
 - **Validation**: Comprehensive validation with error reporting
 - **Import/Export**: JSON serialization for saving configurations
+
+## What's New in v1.1.0
+
+### Manual Groups Configuration
+You can now manually set the number of groups for any round. Leave the field blank for auto-calculation, or enter a value to override:
+- **Round 1**: Set groups directly, PPG is calculated automatically
+- **Middle Rounds**: Set groups to override the cascade calculation
+- **Final Round**: Defaults to 1 group, can be overridden with a warning
+
+### Preset Configurations
+Four preset buttons for quick setup (all use 52,000 competitors, 100 finalists):
+
+| Preset | Rounds | Duration | R1 Groups | Gate Pattern |
+|--------|--------|----------|-----------|--------------|
+| **4 Rounds** | 4 | 16 days | 2,500 | 4 → 2 → 2 → 20 |
+| **5 Rounds** | 5 | 20 days | 6,250 | 4 → 4 → 4 → 2 → 20 |
+| **8 Rounds** | 8 | 16 days | 2,560 | 10 → 10 → 10 → 10 → 10 → 5 → 5 → 20 |
+| **10 Rounds** | 10 | 20 days | 2,560 | 10 (all) → 20 |
+
+Start date automatically set to the next upcoming 4th of the month.
+
+### Improved Flow Diagram
+The competition flow diagram now wraps to multiple lines for competitions with many rounds, preventing UI overflow.
 
 ## Important Constraints
 
@@ -72,9 +99,10 @@ console.table(comp.toTable());
 - `peoplePerGroup` **can** be fractional in Round 1 only (e.g., 25.2)
 - `peoplePerGroup` **should** be integer in middle rounds (uniform groups)
 
-⚠️ **Final Round Requirement:**
-- Final round **must** have exactly `numberOfGroups = 1`
+⚠️ **Final Round Recommendation:**
+- Final round **typically** has `numberOfGroups = 1`
 - All finalists compete together in a single group
+- Can be overridden with manual groups (shows warning)
 
 📖 See [docs/CONSTRAINTS_REFERENCE.md](docs/CONSTRAINTS_REFERENCE.md) for detailed explanation.
 
@@ -104,9 +132,9 @@ Embed the competition configuration tool in any webpage:
 </html>
 ```
 
-Or use via CDN (once deployed to GitHub):
+Or use via CDN:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/username/competition-configuration@1.0.0/widget.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.0/widget.js"></script>
 ```
 
 **Test locally:**
@@ -384,12 +412,12 @@ Testing is done interactively via the web interface (`widget-demo.html`). The No
 
 ## Default Values
 
-- **Starting Competitors**: 45,000
+- **Starting Competitors**: 52,000 (presets)
 - **Target Finalists**: 100
-- **Number of Rounds**: 4
-- **Round Duration**: 4 days
-- **Default Gate Sizes**: [4, 2, 2, 20]
-- **Default Group Sizes**: [calculated, 20, 20, 20]
+- **Number of Rounds**: 4 (default preset)
+- **Round Duration**: 4 days (4/5 round presets) or 2 days (8/10 round presets)
+- **Final Round Gate Size**: 20
+- **Start Date**: Next upcoming 4th of the month
 
 ## License
 
