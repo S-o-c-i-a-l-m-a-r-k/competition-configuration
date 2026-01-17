@@ -64,24 +64,6 @@
                 overflow: hidden;
             }
 
-            .cc-header {
-                background: #1a1a1a;
-                color: #e0e0e0;
-                padding: 20px;
-                text-align: center;
-                border-bottom: 1px solid #404040;
-            }
-
-            .cc-header h1 {
-                font-size: 1.5rem;
-                margin-bottom: 8px;
-            }
-
-            .cc-header p {
-                opacity: 0.9;
-                font-size: 0.85rem;
-            }
-
             .cc-content {
                 display: grid;
                 grid-template-columns: 240px 1fr;
@@ -444,10 +426,6 @@
         return `
             <div class="cc-widget">
                 <div class="cc-container">
-                    <div class="cc-header">
-                        <h1>Competition Configuration</h1>
-                    </div>
-
                     <div class="cc-content">
                         <div class="cc-sidebar">
                             <div class="cc-section">
