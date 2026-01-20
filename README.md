@@ -22,7 +22,7 @@ Perfect for integrating into web applications:
 ```html
 <!-- Add to any webpage -->
 <div id="competition-config"></div>
-<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.0/widget.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.1/widget.js"></script>
 <script>CompetitionConfig.init('competition-config');</script>
 ```
 
@@ -59,7 +59,7 @@ console.table(comp.toTable());
 ## Features
 
 - **Automatic Calculations**: Change Round 1 groups and see all rounds recalculate
-- **Manual Groups Override**: Set exact group counts for any round (new in v1.1.0)
+- **Manual Groups Override**: Set exact group counts for any round (new in v1.1.1)
 - **Preset Configurations**: Quick-start templates for 4, 5, 8, or 10 round competitions
 - **Integer Constraints**: Enforces whole numbers for groups and advancing competitors
 - **Fractional Support**: Handles fractional people per group (e.g., 25.2 people per group)
@@ -67,7 +67,7 @@ console.table(comp.toTable());
 - **Validation**: Comprehensive validation with error reporting
 - **Import/Export**: JSON serialization for saving configurations
 
-## What's New in v1.1.0
+## What's New in v1.1.1
 
 ### Manual Groups Configuration
 You can now manually set the number of groups for any round. Leave the field blank for auto-calculation, or enter a value to override:
@@ -134,7 +134,7 @@ Embed the competition configuration tool in any webpage:
 
 Or use via CDN:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.0/widget.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/S-o-c-i-a-l-m-a-r-k/competition-configuration@v1.1.1/widget.js"></script>
 ```
 
 **Test locally:**
