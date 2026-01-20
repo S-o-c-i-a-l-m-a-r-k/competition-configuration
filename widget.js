@@ -50,17 +50,13 @@
 
             .cc-widget {
                 font-family: var(--font-family), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-                background: #1a1a1a;
-                min-height: 100vh;
                 padding: 12px;
             }
 
             .cc-container {
                 max-width: 1000px;
                 margin: 0 auto;
-                background: #2d2d2d;
                 border-radius: 12px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
                 overflow: hidden;
             }
 
@@ -80,6 +76,7 @@
             }
 
             .cc-main {
+                background: #2d2d2d;
                 padding: 18px;
                 overflow-y: auto;
                 max-height: calc(100vh - 200px);
@@ -97,8 +94,16 @@
                 border-bottom: 2px solid #404040;
             }
 
+            .cc-settings-inputs {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
             .cc-input-group {
                 margin-bottom: 14px;
+                min-width: 80px;
+                flex: 1 1 80px;
             }
 
             .cc-input-group label {
@@ -107,6 +112,7 @@
                 font-weight: 600;
                 color: #b0b0b0;
                 margin-bottom: 4px;
+                min-height: 32px;
             }
 
             .cc-input-group input,
@@ -119,6 +125,7 @@
                 border-radius: 6px;
                 font-size: 0.85rem;
                 transition: border-color 0.2s;
+                height: 34px;
             }
 
             .cc-input-group input:focus,
@@ -132,6 +139,7 @@
                 color: #808080;
                 font-size: 0.7rem;
                 margin-top: 3px;
+                min-height: 16px;
             }
 
             .cc-rounds-config {
@@ -150,7 +158,7 @@
 
             .cc-round-input {
                 display: flex;
-                flex-direction: column;
+                flex-wrap: wrap;
                 gap: 10px;
                 margin-bottom: 8px;
             }
@@ -262,53 +270,81 @@
                 letter-spacing: 0.5px;
             }
 
-            .cc-table-wrapper {
-                overflow-x: auto;
-                border: 1px solid #404040;
-                border-radius: 8px;
+            .cc-rounds-results {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
                 margin-bottom: 15px;
             }
 
-            .cc-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 0.8rem;
-            }
-
-            .cc-table thead {
+            .cc-round-card {
                 background: #1a1a1a;
+                border: 1px solid #404040;
+                border-radius: 10px;
+                overflow: hidden;
             }
 
-            .cc-table th {
-                padding: 8px 10px;
-                text-align: left;
-                font-weight: 600;
-                color: #b0b0b0;
-                border-bottom: 2px solid #404040;
-                font-size: 0.75rem;
-            }
-
-            .cc-table td {
-                padding: 8px 10px;
+            .cc-round-card-header {
+                background: #252525;
+                padding: 10px 14px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 8px;
                 border-bottom: 1px solid #404040;
+            }
+
+            .cc-round-card-title {
+                font-weight: 600;
+                font-size: 0.95rem;
                 color: #e0e0e0;
             }
 
-            .cc-round-header-row td {
-                background: #252525;
-                border-bottom: 1px solid #505050;
-                padding: 6px 10px;
-                font-size: 0.8rem;
+            .cc-round-card-dates {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 8px;
+                font-size: 0.75rem;
+                color: #a0a0a0;
             }
 
-            .cc-round-data-row td {
-                border-bottom: 1px solid #404040;
-                padding-bottom: 10px;
+            .cc-round-card-date {
+                white-space: nowrap;
             }
 
-            .cc-round-header-row:not(:first-child) td {
-                padding-top: 10px;
+            .cc-round-card-date-label {
+                color: #666;
+                margin-right: 4px;
             }
+
+            .cc-round-card-body {
+                padding: 14px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .cc-round-stat {
+                flex: 1 1 100px;
+                min-width: 80px;
+                text-align: center;
+            }
+
+            .cc-round-stat-value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 2px;
+            }
+
+            .cc-round-stat-label {
+                font-size: 0.7rem;
+                color: #888;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
 
             .cc-info-icon {
                 display: inline-block;
@@ -321,14 +357,6 @@
 
             .cc-info-icon:hover {
                 opacity: 1;
-            }
-
-            .cc-table tbody tr:hover {
-                background: #3a3a3a;
-            }
-
-            .cc-table tbody tr.cc-round-header-row:hover {
-                background: #252525;
             }
 
             .cc-badge {
@@ -416,6 +444,24 @@
                     border-right: none;
                     border-bottom: 1px solid #404040;
                 }
+
+                .cc-round-card-body {
+                    padding: 10px;
+                    gap: 8px;
+                }
+
+                .cc-round-stat {
+                    flex: 1 1 60px;
+                    min-width: 50px;
+                }
+
+                .cc-round-stat-value {
+                    font-size: 1rem;
+                }
+
+                .cc-round-stat-label {
+                    font-size: 0.6rem;
+                }
             }
         `;
         document.head.appendChild(style);
@@ -430,43 +476,44 @@
                         <div class="cc-sidebar">
                             <div class="cc-section">
                                 <h3>Competition Settings</h3>
+                                <div class="cc-settings-inputs">
+                                    <div class="cc-input-group">
+                                        <label for="cc-startingCompetitors">Starting Competitors</label>
+                                        <input type="number" id="cc-startingCompetitors" value="63000" min="100" step="100" />
+                                        <small>Total number of participants entering</small>
+                                    </div>
 
-                                <div class="cc-input-group">
-                                    <label for="cc-startingCompetitors">Starting Competitors</label>
-                                    <input type="number" id="cc-startingCompetitors" value="63000" min="100" step="100" />
-                                    <small>Total number of participants entering</small>
-                                </div>
+                                    <div class="cc-input-group">
+                                        <label for="cc-targetFinalists">Target Finalists</label>
+                                        <input type="number" id="cc-targetFinalists" value="100" min="10" step="10" />
+                                        <small>Desired number of finalists</small>
+                                    </div>
 
-                                <div class="cc-input-group">
-                                    <label for="cc-targetFinalists">Target Finalists</label>
-                                    <input type="number" id="cc-targetFinalists" value="100" min="10" step="10" />
-                                    <small>Desired number of finalists</small>
-                                </div>
+                                    <div class="cc-input-group">
+                                        <label for="cc-numberOfRounds">Number of Rounds</label>
+                                        <select id="cc-numberOfRounds">
+                                            <option value="2">2 Rounds</option>
+                                            <option value="3">3 Rounds</option>
+                                            <option value="4" selected>4 Rounds</option>
+                                            <option value="5">5 Rounds</option>
+                                            <option value="6">6 Rounds</option>
+                                            <option value="7">7 Rounds</option>
+                                            <option value="8">8 Rounds</option>
+                                            <option value="9">9 Rounds</option>
+                                            <option value="10">10 Rounds</option>
+                                        </select>
+                                    </div>
 
-                                <div class="cc-input-group">
-                                    <label for="cc-numberOfRounds">Number of Rounds</label>
-                                    <select id="cc-numberOfRounds">
-                                        <option value="2">2 Rounds</option>
-                                        <option value="3">3 Rounds</option>
-                                        <option value="4" selected>4 Rounds</option>
-                                        <option value="5">5 Rounds</option>
-                                        <option value="6">6 Rounds</option>
-                                        <option value="7">7 Rounds</option>
-                                        <option value="8">8 Rounds</option>
-                                        <option value="9">9 Rounds</option>
-                                        <option value="10">10 Rounds</option>
-                                    </select>
-                                </div>
+                                    <div class="cc-input-group">
+                                        <label for="cc-roundDuration">Round Duration</label>
+                                        <input type="number" id="cc-roundDuration" value="4" min="1" max="30" />
+                                        <small>Days. Applied to all rounds</small>
+                                    </div>
 
-                                <div class="cc-input-group">
-                                    <label for="cc-roundDuration">Round Duration (days)</label>
-                                    <input type="number" id="cc-roundDuration" value="4" min="1" max="30" />
-                                    <small>Applied to all rounds</small>
-                                </div>
-
-                                <div class="cc-input-group">
-                                    <label for="cc-startDate">Start Date</label>
-                                    <input type="date" id="cc-startDate" value="2025-11-04" />
+                                    <div class="cc-input-group">
+                                        <label for="cc-startDate">Start Date</label>
+                                        <input type="date" id="cc-startDate" value="2025-11-04" />
+                                    </div>
                                 </div>
                             </div>
 
@@ -496,26 +543,10 @@
 
                             <div id="cc-flowDiagram"></div>
 
-                            <div class="cc-table-wrapper">
-                                <table class="cc-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Round</th>
-                                            <th>Groups</th>
-                                            <th>People/Group</th>
-                                            <th>Gate Size</th>
-                                            <th>Total</th>
-                                            <th>Advancing</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cc-resultsTable">
-                                        <tr>
-                                            <td colspan="6" style="text-align: center; padding: 40px; color: #6c757d;">
-                                                Click "Calculate Competition" to see results
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="cc-rounds-results" id="cc-roundsResults">
+                                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                                    Click "Calculate Competition" to see results
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1019,7 +1050,7 @@
             displayValidation(validation);
             displaySummary(summary);
             displayFlowDiagram();
-            displayTable();
+            displayRoundCards();
 
             const indicator = container.querySelector('#cc-calculatingIndicator');
             if (indicator) indicator.classList.remove('active');
@@ -1099,40 +1130,55 @@
             return date.toLocaleDateString('en-US', options);
         }
 
-        function displayTable() {
-            const tbody = container.querySelector('#cc-resultsTable');
-            tbody.innerHTML = currentCompetition.rounds.map((round, i) => {
+        function displayRoundCards() {
+            const resultsContainer = container.querySelector('#cc-roundsResults');
+            resultsContainer.innerHTML = currentCompetition.rounds.map((round, i) => {
                 const isFinalRound = i === currentCompetition.rounds.length - 1;
                 const isFractional = !Number.isInteger(round.peoplePerGroup);
 
                 const peoplePerGroupFormatted = Number.isInteger(round.peoplePerGroup)
                     ? round.peoplePerGroup.toString()
-                    : round.peoplePerGroup.toFixed(2);
+                    : round.peoplePerGroup.toFixed(1);
+
+                const groupsWarning = isFinalRound && round.numberOfGroups > 1
+                    ? '<span class="cc-badge cc-badge-warning" style="font-size: 0.65rem; margin-left: 4px;">!</span>'
+                    : '';
+                const ppgInfo = isFractional && i === 0
+                    ? '<span class="cc-info-icon" title="Fractional value is OK in Round 1">ⓘ</span>'
+                    : (isFractional && i > 0 ? '<span class="cc-badge cc-badge-warning" style="font-size: 0.65rem; margin-left: 4px;">!</span>' : '');
 
                 return `
-                    <tr class="cc-round-header-row">
-                        <td colspan="6" style="font-weight: 600;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                                <span>${round.name}</span>
-                                <span style="font-size: 0.75rem; opacity: 0.85;">${formatDateLong(round.startDate)} – ${formatDateLong(round.endDate)}</span>
+                    <div class="cc-round-card">
+                        <div class="cc-round-card-header">
+                            <span class="cc-round-card-title">${round.name}</span>
+                            <div class="cc-round-card-dates">
+                                <span class="cc-round-card-date"><span class="cc-round-card-date-label">Starts</span>${formatDateLong(round.startDate)}</span>
+                                <span class="cc-round-card-date"><span class="cc-round-card-date-label">Ends</span>${formatDateLong(round.endDate)}</span>
                             </div>
-                        </td>
-                    </tr>
-                    <tr class="cc-round-data-row">
-                        <td><strong>${i + 1}</strong></td>
-                        <td>
-                            ${round.numberOfGroups.toLocaleString()}
-                            ${isFinalRound && round.numberOfGroups > 1 ? '<span class="cc-badge cc-badge-warning">Should be 1 group</span>' : ''}
-                        </td>
-                        <td>
-                            ${peoplePerGroupFormatted}
-                            ${isFractional && i === 0 ? '<span class="cc-info-icon" title="Fractional value is OK in Round 1">ⓘ</span>' : ''}
-                            ${isFractional && i > 0 ? '<span class="cc-badge cc-badge-warning">Should be integer</span>' : ''}
-                        </td>
-                        <td>${round.gateSize}</td>
-                        <td>${round.totalCompetitors.toLocaleString()}</td>
-                        <td>${round.getAdvancingCompetitors().toLocaleString()}</td>
-                    </tr>
+                        </div>
+                        <div class="cc-round-card-body">
+                            <div class="cc-round-stat">
+                                <div class="cc-round-stat-value">${round.totalCompetitors.toLocaleString()}</div>
+                                <div class="cc-round-stat-label">Competitors</div>
+                            </div>
+                            <div class="cc-round-stat">
+                                <div class="cc-round-stat-value">${round.numberOfGroups.toLocaleString()}${groupsWarning}</div>
+                                <div class="cc-round-stat-label">Groups</div>
+                            </div>
+                            <div class="cc-round-stat">
+                                <div class="cc-round-stat-value">${peoplePerGroupFormatted}${ppgInfo}</div>
+                                <div class="cc-round-stat-label">Per Group</div>
+                            </div>
+                            <div class="cc-round-stat">
+                                <div class="cc-round-stat-value">${round.gateSize}</div>
+                                <div class="cc-round-stat-label">Gate Size</div>
+                            </div>
+                            <div class="cc-round-stat">
+                                <div class="cc-round-stat-value">${round.getAdvancingCompetitors().toLocaleString()}</div>
+                                <div class="cc-round-stat-label">${isFinalRound ? 'Winners' : 'Advance'}</div>
+                            </div>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
